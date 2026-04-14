@@ -1,12 +1,34 @@
 import { test, expect } from '@playwright/test';
+import { BasePage } from '../pages/base_page';
+import { LeftNavigation } from '../pages/left_navigation';
+import { ItemPage } from '../pages/item';
 
+const BASE_URL = 'https://sauce-demo.myshopify.com/';
 
 test('Test Souce Demo', async ({ page }) => {
-  await page.goto('https://sauce-demo.myshopify.com/');
-  await page.getByRole('link', { name: 'Log In' }).click();
+  const basePage = new BasePage(page);
+  await basePage.navigate(BASE_URL);
+  const loginLink = await basePage.getLocator('a');
+  await loginLink.filter({ hasText: 'Log In' }).click();
+  //await page.getByRole('link', { name: 'Log In' }).click();
   await expect(page).toHaveURL(/login/);
+  await basePage.navigate(BASE_URL);
+  //await page.goto('https://sauce-demo.myshopify.com/');
+  //const navigationPanel = new LeftNavigation(page);
+  const links = await basePage.getLocator('a');
+  const homeLink = await links.filter({ hasText: 'Home' });
+  await homeLink.click();
+  const item = new ItemPage(page);
+  await item.clickProduct('Grey jacket');
+  await item.clickAddToCart();
+  //const homeLink = await basePage.getLocator('a');
+  await homeLink.first().click();
+  //await homeLink.filter({ hasText: 'Home' }).click();
+  await item.clickProduct('Noir jacket');
+  await item.clickAddToCart();
+  await basePage.click('a.checkout');
 
-  await page.goto('https://sauce-demo.myshopify.com/');
+  /*
   await page.getByRole('link', { name: 'Grey jacket Grey jacket £' }).click();
   await page.getByRole('button', { name: 'Add to Cart' }).click();
   await page.locator('#main-menu').getByRole('link', { name: 'Home' }).click();
@@ -14,6 +36,7 @@ test('Test Souce Demo', async ({ page }) => {
   await page.getByRole('button', { name: 'Add to Cart' }).click();
   await page.getByRole('link', { name: 'Check Out' }).click();
   await page.locator('a.checkout[href="/cart"]').click();
+  
   await page.click('#checkout');
   await page.getByRole('textbox', { name: 'Email' }).click();
   await page.getByRole('textbox', { name: 'Email' }).fill('test@testcompany.com');
@@ -34,6 +57,6 @@ test('Test Souce Demo', async ({ page }) => {
   await page.getByRole('textbox', { name: 'City' }).fill('LaPaz');
   await page.getByRole('button', { name: 'Pay now' }).click();
   await expect(page.getByText('Your payment details couldn’t')).toBeVisible(); // Card details are validated, so we cannot proceed
-
+  */
 });
 
